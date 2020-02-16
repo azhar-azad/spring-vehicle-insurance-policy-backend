@@ -28,6 +28,14 @@ public class PolicyServiceImpl implements PolicyService {
 		
 		PolicyEntity policyEntity = modelMapper.map(policyDto, PolicyEntity.class);
 		
+		if (policyEntity.getNumber() == "") {
+			throw new PolicyServiceException(ErrorMessages.MISSING_REQUIRED_FIELDS.getErrorMessage() + " : Policy Number");
+		}
+		
+		if (policyEntity.getAmount() == "") {
+			throw new PolicyServiceException(ErrorMessages.MISSING_REQUIRED_FIELDS.getErrorMessage() + " : Policy Amount");
+		}
+		
 		policyEntity.setPolicyId(utils.generatePolicyId(10));
 		PolicyEntity createdPolicy = policyRepository.save(policyEntity);
 		
@@ -40,6 +48,10 @@ public class PolicyServiceImpl implements PolicyService {
 		
 		PolicyEntity policyEntity = policyRepository.findByPolicyId(policyId);
 		
+		if (policyEntity == null) {
+			throw new PolicyServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		}
+		
 		PolicyDto returnValue = modelMapper.map(policyEntity, PolicyDto.class);
 		return returnValue;
 	}
@@ -47,7 +59,19 @@ public class PolicyServiceImpl implements PolicyService {
 	@Override
 	public PolicyDto updatePolicy(String policyId, PolicyDto policyDto) {
 		
+		if (policyDto.getNumber() == "") {
+			throw new PolicyServiceException(ErrorMessages.MISSING_REQUIRED_FIELDS.getErrorMessage() + " : Policy Number");
+		}
+		
+		if (policyDto.getAmount() == "") {
+			throw new PolicyServiceException(ErrorMessages.MISSING_REQUIRED_FIELDS.getErrorMessage() + " : Policy Amount");
+		}
+		
 		PolicyEntity policyEntity = policyRepository.findByPolicyId(policyId);
+		
+		if (policyEntity == null) {
+			throw new PolicyServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		}
 		
 		policyEntity.setNumber(policyDto.getNumber());
 		policyEntity.setAmount(policyDto.getAmount());
