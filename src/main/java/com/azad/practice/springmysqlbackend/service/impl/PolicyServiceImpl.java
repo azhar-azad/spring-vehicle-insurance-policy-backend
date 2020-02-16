@@ -1,7 +1,13 @@
 package com.azad.practice.springmysqlbackend.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.azad.practice.springmysqlbackend.exception.PolicyServiceException;
@@ -93,4 +99,26 @@ public class PolicyServiceImpl implements PolicyService {
 		policyRepository.delete(policyEntity);
 	}
 
+	@Override
+	public List<PolicyDto> getAllPolicy(int page, int limit) {
+		
+		if (page > 0) {
+			page--;
+		}
+		
+		Pageable pageableRequest = PageRequest.of(page, limit);
+		
+		Page<PolicyEntity> policyPage = policyRepository.findAll(pageableRequest);
+		List<PolicyEntity> policyEntityList = policyPage.getContent();
+		
+		List<PolicyDto> returnValue = new ArrayList<PolicyDto>();
+		
+		for (PolicyEntity policyEntity : policyEntityList) {
+			PolicyDto policyDto = modelMapper.map(policyEntity, PolicyDto.class);
+			returnValue.add(policyDto);
+		}
+		
+		return returnValue;
+	}
+	
 }

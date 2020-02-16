@@ -1,7 +1,11 @@
 package com.azad.practice.springmysqlbackend.ui.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.azad.practice.springmysqlbackend.service.PolicyService;
@@ -21,6 +26,7 @@ import com.azad.practice.springmysqlbackend.ui.model.response.RequestOperationSt
 
 @RestController
 @RequestMapping(path = "policies")
+@CrossOrigin("http://localhost:4200")
 public class PolicyController {
 	
 	@Autowired
@@ -47,6 +53,23 @@ public class PolicyController {
 		PolicyRest returnValue = modelMapper.map(policyDto, PolicyRest.class);
 		return returnValue; 
 	}
+	
+	@GetMapping
+	public List<PolicyRest> getAllPolicy(
+    		@RequestParam(value = "page", defaultValue = "0") int page,
+    		@RequestParam(value = "limit", defaultValue = "25") int limit) {
+    	
+    	List<PolicyDto> policyDtoList = policyService.getAllPolicy(page, limit);
+    	
+    	List<PolicyRest> returnValue = new ArrayList<PolicyRest>();
+    	
+    	for (PolicyDto policyDto: policyDtoList) {
+    		PolicyRest policyRest = modelMapper.map(policyDto, PolicyRest.class);
+			returnValue.add(policyRest);
+		}
+    	
+    	return returnValue;
+    }
 	
 	@PutMapping("/{policyId}")
 	public PolicyRest updatePolicy(@PathVariable String policyId, 
